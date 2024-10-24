@@ -1,5 +1,6 @@
 ﻿using api.Data;
 using api.Dtos.Stock;
+using api.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Client;
@@ -36,6 +37,18 @@ namespace api.Controller
             }
             var stockDto= _mapper.Map<StockDto>(stock);
             return Ok(stockDto);
+        }
+
+        [HttpPost]
+        public IActionResult Create([FromBody]CreateStockRequestDto stock) { 
+            var stockModel=_mapper.Map<Stock>(stock);
+            _context.Stocks.Add(stockModel);
+            _context.SaveChanges();
+
+            var stockDto = _mapper.Map<StockDto>(stockModel);
+
+            return CreatedAtAction(nameof(GetById), new { id = stockModel.Id }, stockDto);
+        
         }
 
     }

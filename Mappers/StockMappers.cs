@@ -8,6 +8,7 @@ namespace api.Mappers
         {
             // Map Stock to StockDto and vice versa
             CreateMap<Models.Stock, Dtos.Stock.StockDto>().ReverseMap();
+            CreateMap<Models.Stock, Dtos.Stock.CreateStockRequestDto>().ReverseMap();
         }
     }
 }
