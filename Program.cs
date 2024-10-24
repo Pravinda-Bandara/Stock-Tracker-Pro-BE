@@ -6,10 +6,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+//2. add contoller
+builder.Services.AddControllers();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-//Add DBContext
+//1. Add DBContext
 builder.Services.AddDbContext<ApplicationDBContext>(Options => {
     Options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
@@ -25,5 +29,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+//3. add Mapcontrollers
+app.MapControllers();
 
 app.Run();
