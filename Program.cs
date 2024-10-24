@@ -12,6 +12,8 @@ builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+//4. add AutoMappe
+builder.Services.AddAutoMapper(typeof(Program));
 
 //1. Add DBContext
 builder.Services.AddDbContext<ApplicationDBContext>(Options => {

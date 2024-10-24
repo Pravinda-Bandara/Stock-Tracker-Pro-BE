@@ -1,4 +1,6 @@
 ﻿using api.Data;
+using api.Dtos.Stock;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Client;
 
@@ -9,16 +11,19 @@ namespace api.Controller
     public class StockController : ControllerBase
     {
         private readonly ApplicationDBContext _context;
-        public StockController (ApplicationDBContext context)
+        private readonly IMapper _mapper;
+        public StockController (ApplicationDBContext context , IMapper mapper)
         {
           _context= context;
+          _mapper=mapper;
         }
 
 
         [HttpGet]
         public IActionResult GetAll() { 
             var stoks=_context.Stocks.ToList(); 
-            return Ok(stoks);
+            var stockDto=_mapper.Map<List<StockDto>>(stoks);
+            return Ok(stockDto);
         }
 
         [HttpGet("{id}")]
@@ -29,7 +34,8 @@ namespace api.Controller
             {
                 return NotFound();
             }
-            return Ok(stock);
+            var stockDto= _mapper.Map<StockDto>(stock);
+            return Ok(stockDto);
         }
 
     }
