@@ -58,12 +58,26 @@ namespace api.Controller
             var stockModel = _context.Stocks.FirstOrDefault(stock => stock.Id == id);
             if (stockModel == null) 
             {
-                return NotFound(nameof(GetById));
+                return NotFound();
             }
             _mapper.Map(updateStockDto, stockModel);
             _context.SaveChanges();
             var stockDto = _mapper.Map<StockDto>(stockModel);
             return Ok(stockDto);
+        }
+
+        [HttpDelete]
+        [Route("{id}")]
+        public IActionResult Delete([FromRoute] int id) 
+        {
+            var stockModel = _context.Stocks.FirstOrDefault(stock => stock.Id == id);
+            if (stockModel == null)
+            {
+                return NotFound(nameof(GetById));
+            }
+            _context.Stocks.Remove(stockModel);
+            _context.SaveChanges();
+            return NoContent();
         }
     }
 }
