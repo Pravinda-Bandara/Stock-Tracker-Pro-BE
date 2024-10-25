@@ -51,5 +51,19 @@ namespace api.Controller
         
         }
 
+        [HttpPut]
+        [Route("{id}")]
+        public IActionResult Update([FromRoute] int id, [FromBody] UpdateStockRequestDto updateStockDto) 
+        { 
+            var stockModel = _context.Stocks.FirstOrDefault(stock => stock.Id == id);
+            if (stockModel == null) 
+            {
+                return NotFound(nameof(GetById));
+            }
+            _mapper.Map(updateStockDto, stockModel);
+            _context.SaveChanges();
+            var stockDto = _mapper.Map<StockDto>(stockModel);
+            return Ok(stockDto);
+        }
     }
 }
