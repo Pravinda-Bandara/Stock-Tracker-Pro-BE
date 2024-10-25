@@ -34,11 +34,8 @@ namespace api.Controller
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         { 
-            var stock =await _context.Stocks.FindAsync(id);
-            if (stock == null)
-            {
-                return NotFound();
-            }
+            var stock =await _stockRepository.GetByIdAsync(id);
+
             var stockDto= _mapper.Map<StockDto>(stock);
             return Ok(stockDto);
         }
@@ -46,8 +43,7 @@ namespace api.Controller
         [HttpPost]
         public async Task<IActionResult> Create([FromBody]CreateStockRequestDto stock) { 
             var stockModel=_mapper.Map<Stock>(stock);
-            await _context.Stocks.AddAsync(stockModel);
-            await _context.SaveChangesAsync();
+            await _stockRepository.CreateAsync(stockModel);
 
             var stockDto = _mapper.Map<StockDto>(stockModel);
 
@@ -58,14 +54,8 @@ namespace api.Controller
         [HttpPut]
         [Route("{id}")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateStockRequestDto updateStockDto) 
-        { 
-            var stockModel =await _context.Stocks.FirstOrDefaultAsync(stock => stock.Id == id);
-            if (stockModel == null) 
-            {
-                return NotFound();
-            }
-            _mapper.Map(updateStockDto, stockModel);
-            await _context.SaveChangesAsync();
+        {
+            var stockModel = await _stockRepository.UpdateAsync(id,updateStockDto);
             var stockDto = _mapper.Map<StockDto>(stockModel);
             return Ok(stockDto);
         }
@@ -74,13 +64,7 @@ namespace api.Controller
         [Route("{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id) 
         {
-            var stockModel = await _context.Stocks.FirstOrDefaultAsync(stock => stock.Id == id);
-            if (stockModel == null)
-            {
-                return NotFound(nameof(GetById));
-            }
-            _context.Stocks.Remove(stockModel);
-            await _context.SaveChangesAsync();
+            var stockModel = await _stockRepository.DeleteAsync(id);
             return NoContent();
         }
     }
