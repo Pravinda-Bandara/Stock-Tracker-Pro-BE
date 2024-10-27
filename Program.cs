@@ -24,6 +24,7 @@ builder.Services.AddDbContext<ApplicationDBContext>(Options => {
 
 //5.add Repository
 builder.Services.AddScoped<IStockRepository,StockReposiory>();
+builder.Services.AddScoped<ICommentRepository,CommentRepository>();
 
 var app = builder.Build();
 

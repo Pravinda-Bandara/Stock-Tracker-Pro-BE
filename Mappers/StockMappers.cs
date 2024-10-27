@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using api.Dtos.Comment;
+using AutoMapper;
 
 namespace api.Mappers
 {
@@ -10,6 +11,9 @@ namespace api.Mappers
             CreateMap<Models.Stock, Dtos.Stock.StockDto>().ReverseMap();
             CreateMap<Models.Stock, Dtos.Stock.CreateStockRequestDto>().ReverseMap();
             CreateMap<Models.Stock, Dtos.Stock.UpdateStockRequestDto>().ReverseMap();
+
+            //Comment
+            CreateMap<Models.Comment, Dtos.Comment.CommentDto>().ReverseMap();
         }
     }
 }
