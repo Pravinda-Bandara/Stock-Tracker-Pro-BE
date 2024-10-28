@@ -1,4 +1,5 @@
 ﻿using api.Data;
+using api.Dtos.Comment;
 using api.Dtos.Stock;
 using api.Interfaces;
 using api.Models;
@@ -39,13 +40,19 @@ namespace api.Repository
         }
 
         public Task<List<Stock>> GetAllAsync()
-        { 
-           return _context.Stocks.ToListAsync();
+        {
+            return _context.Stocks
+                           .Include(c => c.Comments)
+                           .ToListAsync();
         }
+
 
         public async Task<Stock?> GetByIdAsync(int id)
         {
-            return await _context.Stocks.FindAsync(id);
+            return  await _context.Stocks
+                                      .Include(c => c.Comments)
+                                      .FirstOrDefaultAsync(i => i.Id == id);
+
         }
 
         public async Task<Stock?> UpdateAsync(int id, UpdateStockRequestDto stockDto)

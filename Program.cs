@@ -2,29 +2,34 @@ using api.Data;
 using api.Interfaces;
 using api.Repository;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
-//2. add contoller
-builder.Services.AddControllers();
-
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-//4. add AutoMappe
-builder.Services.AddAutoMapper(typeof(Program));
-
-//1. Add DBContext
-builder.Services.AddDbContext<ApplicationDBContext>(Options => {
-    Options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+// 1. Add DBContext
+builder.Services.AddDbContext<ApplicationDBContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-//5.add Repository
-builder.Services.AddScoped<IStockRepository,StockReposiory>();
-builder.Services.AddScoped<ICommentRepository,CommentRepository>();
+// 6. Add Controllers and configure NewtonSoft
+builder.Services.AddControllers()
+    .AddNewtonsoftJson(options =>
+    {
+        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+    });
+
+// 3. Add Endpoints API Explorer and Swagger for API documentation
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// 4. Add AutoMapper
+builder.Services.AddAutoMapper(typeof(Program));
+
+// 5. Add Repositories
+builder.Services.AddScoped<IStockRepository, StockReposiory>();
+builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 
 var app = builder.Build();
 
