@@ -31,7 +31,7 @@ namespace api.Controller
             var commentDtos = _mapper.Map<List<CommentDto>>(comments);
             return Ok(commentDtos);
         }
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
             var comment = await _commentRepository.GetByIdAsync(id);
@@ -39,7 +39,7 @@ namespace api.Controller
             return Ok(commentDto);
         }
 
-        [HttpPost("{stockId}")]
+        [HttpPost("{stockId:int}")]
         public async Task<IActionResult> Create([FromRoute] int stockId, CreateCommentDto commentDto)
         {
             if (!await _stockRepository.StockExists(stockId))
@@ -54,7 +54,22 @@ namespace api.Controller
             return Ok(responseCommentmodel);
         }
 
-        [HttpDelete("{id}")]
+        [HttpPut]
+        [Route("{id:int}")]
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateCommentRequestDto updateDto)
+        {
+            var commentModel = _mapper.Map<Comment>(updateDto);
+            var CommentDto=await _commentRepository.UpdateAsync(id, commentModel);
+
+            if (CommentDto == null)
+            {
+                return NotFound("Comment not found");
+            }
+            var ResCommentModel=_mapper.Map<Comment>(CommentDto);
+            return Ok(ResCommentModel);
+        }
+
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete([FromRoute] int id) 
         {
             var commentModel = await _commentRepository.DeleteAsync(id);
