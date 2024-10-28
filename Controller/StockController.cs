@@ -26,14 +26,18 @@ namespace api.Controller
 
         [HttpGet]
         public async Task<IActionResult> GetAll() {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             var stoks = await _stockRepository.GetAllAsync(); 
             var stockDtos=_mapper.Map<List<StockDto>>(stoks);
             return Ok(stockDtos);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById([FromRoute] int id)
-        { 
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             var stock =await _stockRepository.GetByIdAsync(id);
 
             var stockDto= _mapper.Map<StockDto>(stock);
@@ -41,7 +45,9 @@ namespace api.Controller
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody]CreateStockRequestDto stock) { 
+        public async Task<IActionResult> Create([FromBody]CreateStockRequestDto stock) {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             var stockModel=_mapper.Map<Stock>(stock);
             await _stockRepository.CreateAsync(stockModel);
 
@@ -52,18 +58,22 @@ namespace api.Controller
         }
 
         [HttpPut]
-        [Route("{id}")]
+        [Route("{id:int}")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateStockRequestDto updateStockDto) 
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             var stockModel = await _stockRepository.UpdateAsync(id,updateStockDto);
             var stockDto = _mapper.Map<StockDto>(stockModel);
             return Ok(stockDto);
         }
 
         [HttpDelete]
-        [Route("{id}")]
+        [Route("{id:int}")]
         public async Task<IActionResult> Delete([FromRoute] int id) 
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             var stockModel = await _stockRepository.DeleteAsync(id);
             return NoContent();
         }

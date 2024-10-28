@@ -27,6 +27,8 @@ namespace api.Controller
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             var comments = await _commentRepository.GetAllAsync();
             var commentDtos = _mapper.Map<List<CommentDto>>(comments);
             return Ok(commentDtos);
@@ -34,6 +36,8 @@ namespace api.Controller
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             var comment = await _commentRepository.GetByIdAsync(id);
             var commentDto = _mapper.Map<CommentDto>(comment);
             return Ok(commentDto);
@@ -42,6 +46,8 @@ namespace api.Controller
         [HttpPost("{stockId:int}")]
         public async Task<IActionResult> Create([FromRoute] int stockId, CreateCommentDto commentDto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             if (!await _stockRepository.StockExists(stockId))
             {
                 return BadRequest("Stock doenot exist");
@@ -58,6 +64,8 @@ namespace api.Controller
         [Route("{id:int}")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateCommentRequestDto updateDto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             var commentModel = _mapper.Map<Comment>(updateDto);
             var CommentDto=await _commentRepository.UpdateAsync(id, commentModel);
 
@@ -72,6 +80,8 @@ namespace api.Controller
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete([FromRoute] int id) 
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             var commentModel = await _commentRepository.DeleteAsync(id);
             if(commentModel != null) 
             { 
