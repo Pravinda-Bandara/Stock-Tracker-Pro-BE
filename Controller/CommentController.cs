@@ -27,6 +27,12 @@ namespace api.Controller
             var commentDtos = _mapper.Map<List<CommentDto>>(comments);
             return Ok(commentDtos);
         }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById([FromRoute] int id)
+        {
+            var comment =await _commentRepository.GetByIdAsync(id);
+            var commentDto = _mapper.Map<CommentDto>(comment);
+            return Ok(commentDto);
+        }
     }
-
 }
