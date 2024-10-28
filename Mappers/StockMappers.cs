@@ -14,6 +14,7 @@ namespace api.Mappers
 
             //Comment
             CreateMap<Models.Comment, Dtos.Comment.CommentDto>().ReverseMap();
+            CreateMap<Models.Comment, Dtos.Comment.CreateCommentDto>().ReverseMap();
         }
     }
 }
