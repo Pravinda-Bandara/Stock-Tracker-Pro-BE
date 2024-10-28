@@ -3,6 +3,7 @@ using api.Dtos.Comment;
 using api.Interfaces;
 using api.Models;
 using AutoMapper;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controller
@@ -39,18 +40,29 @@ namespace api.Controller
         }
 
         [HttpPost("{stockId}")]
-        public async Task<IActionResult> Create([FromRoute] int stockId ,CreateCommentDto commentDto) 
+        public async Task<IActionResult> Create([FromRoute] int stockId, CreateCommentDto commentDto)
         {
-            if (!await _stockRepository.StockExists(stockId)) 
+            if (!await _stockRepository.StockExists(stockId))
             {
                 return BadRequest("Stock doenot exist");
             }
-            var commentModel=_mapper.Map<Comment>(commentDto);
+            var commentModel = _mapper.Map<Comment>(commentDto);
             commentModel.StockId = stockId;
-            var comment=await _commentRepository.CreateAsync(commentModel);
+            var comment = await _commentRepository.CreateAsync(commentModel);
 
-            var responseCommentmodel= _mapper.Map<CreateCommentDto>(comment);
+            var responseCommentmodel = _mapper.Map<CreateCommentDto>(comment);
             return Ok(responseCommentmodel);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete([FromRoute] int id) 
+        {
+            var commentModel = await _commentRepository.DeleteAsync(id);
+            if(commentModel != null) 
+            { 
+                return NotFound("comment does bit exist");
+            }
+            return Ok();
         }
     }
 }
