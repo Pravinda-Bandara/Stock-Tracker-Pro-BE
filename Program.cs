@@ -100,6 +100,7 @@ builder.Services.AddAuthentication(options =>
 // 5. Add Repositories
 builder.Services.AddScoped<IStockRepository, StockReposiory>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+builder.Services.AddScoped<IPortfolioRepository, PortfolioRepository>();
 //10 . add tokent service
 builder.Services.AddScoped<ITokenService,TokenService>();
 
