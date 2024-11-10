@@ -117,6 +117,15 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+//12. Cors
+app.UseCors(x => x
+     .AllowAnyMethod()
+     .AllowAnyHeader()
+     .AllowCredentials()
+      //.WithOrigins("https://localhost:44351))
+      .SetIsOriginAllowed(origin => true));
+
+
 //9. add  then database mig,update
 app.UseAuthentication();
 app.UseAuthorization();

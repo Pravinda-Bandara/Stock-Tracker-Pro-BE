@@ -1,9 +1,11 @@
 ﻿
 using api.Dtos.Comment;
 using api.Extentions;
+using api.Helpers;
 using api.Interfaces;
 using api.Models;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -21,7 +23,7 @@ namespace api.Controller
         private readonly UserManager<AppUser> _userManager;
         private readonly IFMPService _fmpService;
 
-        public CommentController(ICommentRepository commentRepository, IMapper mapper, IStockRepository stockRepository , UserManager<AppUser> userManager , IFMPService fmpService)
+        public CommentController(ICommentRepository commentRepository, IMapper mapper, IStockRepository stockRepository, UserManager<AppUser> userManager, IFMPService fmpService)
         {
             _commentRepository = commentRepository;
             _mapper = mapper;
@@ -31,11 +33,12 @@ namespace api.Controller
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        [Authorize]
+        public async Task<IActionResult> GetAll([FromQuery] CommentQueryObject queryObject)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            var comments = await _commentRepository.GetAllAsync();
+            var comments = await _commentRepository.GetAllAsync(queryObject);
             var commentDtos = _mapper.Map<List<CommentDto>>(comments);
             return Ok(commentDtos);
         }
