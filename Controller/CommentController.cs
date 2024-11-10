@@ -19,13 +19,15 @@ namespace api.Controller
         private readonly IStockRepository _stockRepository;
         private readonly IMapper _mapper;
         private readonly UserManager<AppUser> _userManager;
+        private readonly IFMPService _fmpService;
 
-        public CommentController(ICommentRepository commentRepository, IMapper mapper, IStockRepository stockRepository , UserManager<AppUser> userManager)
+        public CommentController(ICommentRepository commentRepository, IMapper mapper, IStockRepository stockRepository , UserManager<AppUser> userManager , IFMPService fmpService)
         {
             _commentRepository = commentRepository;
             _mapper = mapper;
             _stockRepository = stockRepository;
             _userManager = userManager;
+            _fmpService = fmpService;
         }
 
         [HttpGet]
@@ -47,14 +49,23 @@ namespace api.Controller
             return Ok(commentDto);
         }
 
-        [HttpPost("{stockId:int}")]
-        public async Task<IActionResult> Create([FromRoute] int stockId, CreateCommentDto commentDto)
+        [HttpPost("{symbol:alpha}")]
+        public async Task<IActionResult> Create([FromRoute] string symbol, CreateCommentDto commentDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            if (!await _stockRepository.StockExists(stockId))
-            {
-                return BadRequest("Stock doenot exist");
+            var stock = await _stockRepository.GetBySymbolAsync(symbol);
+            if (stock == null) 
+            { 
+                stock = await _fmpService.FindStockBySymbolAsync(symbol);
+                if (stock == null)
+                {
+                    return BadRequest("Stock dose not exist");
+                }
+                else
+                {
+                    await _stockRepository.CreateAsync(stock);
+                }
             }
 
             var useName = User.GetUsername();
@@ -62,7 +73,7 @@ namespace api.Controller
 
             var commentModel = _mapper.Map<Comment>(commentDto);
             commentModel.AppUserId = appUser.Id;
-            commentModel.StockId = stockId;
+            commentModel.StockId = stock.Id;
             var comment = await _commentRepository.CreateAsync(commentModel);
 
             var responseCommentmodel = _mapper.Map<CreateCommentDto>(comment);
