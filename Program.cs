@@ -101,6 +101,8 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddScoped<IStockRepository, StockReposiory>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IPortfolioRepository, PortfolioRepository>();
+builder.Services.AddScoped<IFMPService, FMPService>();
+builder.Services.AddHttpClient<IFMPService,FMPService>();
 //10 . add tokent service
 builder.Services.AddScoped<ITokenService,TokenService>();
 
