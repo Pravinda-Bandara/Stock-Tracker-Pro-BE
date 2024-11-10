@@ -32,7 +32,7 @@ namespace api.Controller
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             var stoks = await _stockRepository.GetAllAsync(query); 
-            var stockDtos=_mapper.Map<List<StockDto>>(stoks);
+            var stockDtos=_mapper.Map<List<StockDto>>(stoks).ToList();
             return Ok(stockDtos);
         }
 
