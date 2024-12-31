@@ -98,11 +98,13 @@ builder.Services.AddAuthentication(options =>
 });
 
 // 5. Add Repositories
-builder.Services.AddScoped<IStockRepository, StockReposiory>();
+builder.Services.AddScoped<IStockRepository, StockRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IPortfolioRepository, PortfolioRepository>();
 builder.Services.AddScoped<IFMPService, FMPService>();
 builder.Services.AddHttpClient<IFMPService,FMPService>();
+builder.Services.AddScoped<IStockService, StockService>();
+
 //10 . add tokent service
 builder.Services.AddScoped<ITokenService,TokenService>();
 

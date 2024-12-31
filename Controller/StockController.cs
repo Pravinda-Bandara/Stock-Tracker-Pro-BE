@@ -15,24 +15,21 @@ namespace api.Controller
     [ApiController]
     public class StockController : ControllerBase
     {
-        private readonly ApplicationDBContext _context;
-        private readonly IMapper _mapper;
-        private readonly IStockRepository _stockRepository;
-        public StockController (ApplicationDBContext context , IMapper mapper ,IStockRepository stockRepository)
-        {
-          _context= context;
-          _mapper=mapper;
-          _stockRepository=stockRepository;
-        }
+        private readonly IStockService _stockService;
 
+        public StockController(IStockService stockService)
+        {
+            _stockService = stockService;
+        }
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetAll([FromQuery]QueryObject query) {
+        public async Task<IActionResult> GetAll([FromQuery] QueryObject query)
+        {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            var stoks = await _stockRepository.GetAllAsync(query); 
-            var stockDtos=_mapper.Map<List<StockDto>>(stoks).ToList();
+
+            var stockDtos = await _stockService.GetAllAsync(query);
             return Ok(stockDtos);
         }
 
@@ -41,43 +38,47 @@ namespace api.Controller
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            var stock =await _stockRepository.GetByIdAsync(id);
 
-            var stockDto= _mapper.Map<StockDto>(stock);
+            var stockDto = await _stockService.GetByIdAsync(id);
+            if (stockDto == null)
+                return NotFound();
+
             return Ok(stockDto);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody]CreateStockRequestDto stock) {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-            var stockModel=_mapper.Map<Stock>(stock);
-            await _stockRepository.CreateAsync(stockModel);
-
-            var stockDto = _mapper.Map<StockDto>(stockModel);
-
-            return CreatedAtAction(nameof(GetById), new { id = stockModel.Id }, stockDto);
-        
-        }
-
-        [HttpPut]
-        [Route("{id:int}")]
-        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateStockRequestDto updateStockDto) 
+        public async Task<IActionResult> Create([FromBody] CreateStockRequestDto stock)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            var stockModel = await _stockRepository.UpdateAsync(id,updateStockDto);
-            var stockDto = _mapper.Map<StockDto>(stockModel);
-            return Ok(stockDto);
+
+            var createdStock = await _stockService.CreateAsync(stock);
+            return CreatedAtAction(nameof(GetById), new { id = createdStock.Id }, createdStock);
         }
 
-        [HttpDelete]
-        [Route("{id:int}")]
-        public async Task<IActionResult> Delete([FromRoute] int id) 
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateStockRequestDto updateStockDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            var stockModel = await _stockRepository.DeleteAsync(id);
+
+            var updatedStock = await _stockService.UpdateAsync(id, updateStockDto);
+            if (updatedStock == null)
+                return NotFound();
+
+            return Ok(updatedStock);
+        }
+
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> Delete([FromRoute] int id)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var isDeleted = await _stockService.DeleteAsync(id);
+            if (!isDeleted)
+                return NotFound();
+
             return NoContent();
         }
     }

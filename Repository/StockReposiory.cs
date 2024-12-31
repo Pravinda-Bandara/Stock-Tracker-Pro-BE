@@ -10,15 +10,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace api.Repository
 {
-    public class StockReposiory : IStockRepository
-        
+    public class StockRepository : IStockRepository
     {
         private readonly ApplicationDBContext _context;
-        private readonly IMapper _mapper;
-        public StockReposiory(ApplicationDBContext context , IMapper mapper)
+
+        public StockRepository(ApplicationDBContext context)
         {
-            _context = context; 
-            _mapper = mapper;
+            _context = context;
         }
 
         public async Task<Stock> CreateAsync(Stock stockModel)
@@ -31,7 +29,7 @@ namespace api.Repository
         public async Task<Stock?> DeleteAsync(int id)
         {
             var stockModel = await _context.Stocks.FirstOrDefaultAsync(x => x.Id == id);
-            if (stockModel == null) 
+            if (stockModel == null)
             {
                 return null;
             }
@@ -40,37 +38,17 @@ namespace api.Repository
             return stockModel;
         }
 
-        public async Task<List<Stock>> GetAllAsync(QueryObject query)
+        public async Task<List<Stock>> GetAllAsync()
         {
-            var stocks = _context.Stocks.Include(c => c.Comments).ThenInclude(a => a.AppUser).AsQueryable();
-            if (!string.IsNullOrWhiteSpace(query.CompanyName))
-            { 
-                stocks=stocks.Where(s=>s.CompanyName.Contains(query.CompanyName));
-            }
-
-            if (!string.IsNullOrWhiteSpace(query.Symbol))
-            {
-                stocks = stocks.Where(s => s.Symbol.Contains(query.Symbol));
-            }
-
-            if (!string.IsNullOrWhiteSpace(query.SortBy))
-            {
-                if (query.SortBy.Equals("Symbol", StringComparison.OrdinalIgnoreCase)) 
-                {
-                    stocks = query.IsDecsending ? stocks.OrderByDescending(s => s.Symbol):stocks.OrderBy(s => s.Symbol);
-                }
-            }
-            var skipNumber = (query.PageNumber - 1)*query.PageSize;
-            return await stocks.Skip(skipNumber).Take(query.PageSize).ToListAsync();
+            return await _context.Stocks.Include(c => c.Comments).ThenInclude(a => a.AppUser).ToListAsync();
         }
 
 
         public async Task<Stock?> GetByIdAsync(int id)
         {
-            return  await _context.Stocks
-                                      .Include(c => c.Comments)
-                                      .FirstOrDefaultAsync(i => i.Id == id);
-
+            return await _context.Stocks
+                                 .Include(c => c.Comments)
+                                 .FirstOrDefaultAsync(i => i.Id == id);
         }
 
         public async Task<Stock?> GetBySymbolAsync(string symbol)
@@ -80,19 +58,19 @@ namespace api.Repository
 
         public async Task<bool> StockExists(int id)
         {
-            return await _context.Stocks.AnyAsync(s=>s.Id == id);
+            return await _context.Stocks.AnyAsync(s => s.Id == id);
         }
 
-        public async Task<Stock?> UpdateAsync(int id, UpdateStockRequestDto stockDto)
+        public async Task<Stock?> UpdateAsync(Stock stockModel)
         {
-            var existingStock = await _context.Stocks.FirstOrDefaultAsync(x=>x.Id == id);
-            if (existingStock == null) 
-            {
-                return null;
-            }
-            _mapper.Map(stockDto, existingStock);
+            _context.Stocks.Update(stockModel);
             await _context.SaveChangesAsync();
-            return existingStock;
+            return stockModel;
+        }
+
+        public Task<Stock?> UpdateAsync(int id, UpdateStockRequestDto stockDto)
+        {
+            throw new NotImplementedException();
         }
     }
 }
