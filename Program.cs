@@ -104,6 +104,7 @@ builder.Services.AddScoped<IPortfolioRepository, PortfolioRepository>();
 builder.Services.AddScoped<IFMPService, FMPService>();
 builder.Services.AddHttpClient<IFMPService,FMPService>();
 builder.Services.AddScoped<IStockService, StockService>();
+builder.Services.AddScoped<ICommentService, CommentService>();
 
 //10 . add tokent service
 builder.Services.AddScoped<ITokenService,TokenService>();
